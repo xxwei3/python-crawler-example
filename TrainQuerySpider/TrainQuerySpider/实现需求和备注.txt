@@ -1,0 +1,78 @@
+------------------------------------------------------------------
+开发制作时间：2019-08-05~2019-08-08
+环境：
+    Python2.7
+    Scrapy1.6.0
+
+流程：
+    目标网址：https://kyfw.12306.cn/otn/leftTicket/init?linktypeid=dc&fs=%E5%90%88%E8%82%A5,HFH&ts=%E9%98%9C%E9%98%B3,FYH&date=2019-08-08&flag=N,N,Y
+	条件：8.8-合肥-阜阳
+
+    # 测试
+    先scrapy shell 看下是否存在反爬虫机制，response.xpath('xxxx').extract(),
+         发现无法获取tbody标签内的表格数据，因此不能使用常规流程爬取静态网页，需要通过接口信息找到规律。
+
+    # 12306各个站点的js信息，通过该URL将需要的站点信息提取出来
+    https://kyfw.12306.cn/otn/resources/js/framework/station_name.js?station_version=1.9108
+
+    # 请求的接口信息（Get请求，包含了出发时间、出发站点、到达站点，成人片还是学生票--ADULT为成人票）
+    https://kyfw.12306.cn/otn/leftTicket/query?leftTicketDTO.train_date=2019-08-08&leftTicketDTO.from_station=HFH&leftTicketDTO.to_station=FYH&purpose_codes=ADULT
+
+    # 创建项目
+        scrapy startproject TrainQuerySpider
+    # 创建查询QueryInfoSpider
+        scrapy genspider query_info "kyfw.12306.cn"
+    # 定义item (爬取字段确定)
+    # 开发Spider类
+    # 管道文件输出
+    # 检查和进行相关配置
+
+    # 启动QueryInfoSpider
+        scrapy crawl query_info
+------------------------------------------------------------------
+实现需求列表：
+
+    0、处理各种乱码，各种异常信息-(待完善)
+    1、出发站点和到达站点需要判断是始发，经过，终点等状态-（已实现）
+    2、判断有无出发地--目的地的车次信息数据，有数据时导出到CSV文件保存（后缀名：trains_当前时间.csv），无数据不导出（TODO）
+    3、可以自由选择输入查询条件：出发地，目的地，行程日期，成人票还是学生票-（较难）-（已实现）
+    4、可以输出高铁、动车、直达、特快、快速等条件的车次信息（较难）
+    5、定时刷新出发地--目的地的余票信息（较难）
+
+目前实现了：
+    输入出发站点、到达站点、时间和票类，查询正确的车次信息，并导出到CSV文件中。
+------------------------------------------------------------------
+备注一下开发过程中遇到的错误：
+
+    报错1：UnicodeDecodeError: 'ascii' codec can't decode byte 0xe8 in position 1: ordinal not in range(128)
+    解决：---->
+        import sys
+        reload(sys)
+        sys.setdefaultencoding('utf-8')
+
+    报错2：Non-ASCII character '\xe5' in file D:\gitrepository\python-crawler-example\TrainQuerySpider\TrainQuerySpider\spiders\messy_code.py on line 3, but no e
+            ncoding declared; see http://python.org/dev/peps/pep-0263/ for details
+    解决：---->
+        在py文件第一行添加  # -*- coding: utf-8 -*-
+
+    报错3：Shadows name 'lists' from outer scope
+    解决：---->
+        PyCharm编辑器的警告，原因是外部传入的变量的名字，和函数内部的变量名是一样的，因此需要保持不同名即可
+
+    报错4：python字典的key是汉字,get无法取值
+    解决：---->参考：https://zhidao.baidu.com/question/628143718700079844.html
+        yy = raw_input('xxxxx').decode('gbk').encode('utf-8')
+
+    报错5：UnicodeDecodeError: 'utf8' codec can't decode byte 0xb8 in position 0: invalid start byte
+    解决：---->
+        字典里返回的格式如：{u'合肥'：u'HFH'}，如果只get('合肥')是得不到结果的，在变量上使用u'{}'.format(变量)，报这个错
+
+    报错5：不同文件夹的.py相互引用问题？？
+    解决：----> TODO
+
+------------------------------------------------------------------
+心得：
+    1、python2.x处理乱码时真的很烦，很头疼，后面考虑使用3版本的进行爬虫
+    2、为了实现一个既定的需求，需要做许多的测试和调试，因此需要有耐心和信心
+    3、后面继续完善该爬虫项目，将其他的需求，以及其他的爬虫技巧学习并运用起来
+------------------------------------------------------------------
