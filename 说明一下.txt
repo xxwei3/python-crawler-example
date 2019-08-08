@@ -4,3 +4,6 @@ update：2019/07/31 11:38
 
 BossDirecruitSpider ：爬取boss直聘网上职位分页列表信息，并导出到CSV文件中。
 update：2019/08/05 11:27
+
+TrainQuerySpider：爬取12306火车票信息案例并导出到CSV文件，可以输入任意站点进行查询车票信息。
+update：2019/08/09 13:15
