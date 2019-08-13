@@ -3,6 +3,7 @@ import scrapy
 
 from BossDirecruitSpider.items import BossdirecruitspiderItem
 
+
 # 第一个爬虫练习案例
 class JobInfoSpider(scrapy.Spider):
     name = 'job_info'
@@ -11,6 +12,7 @@ class JobInfoSpider(scrapy.Spider):
     # start_urls = ['https://www.zhipin.com/c101220100-p100101/']
     # 合肥地区web前端招聘信息
     start_urls = ['https://www.zhipin.com/job_detail/?query=&city=101220100&industry=&position=']
+
     # 合肥地区人事行政前台招聘信息
     # start_urls = ['https://www.zhipin.com/c101220100-p150202/?ka=search_150202']
     # 合肥地区汽车行业4S店管理岗位招聘信息
@@ -63,11 +65,10 @@ class JobInfoSpider(scrapy.Spider):
 
             # yield 将会创建一个生成器,将 item 对象返回给 Scrapy 引擎
             yield item
-
-            # 定义下页标签的元素位置
-            # next_page = response.xpath('//div[@class="page"]/a/@href').extract()[4]
-            next_page = response.xpath('//div[@class="page"]/a/@href').extract()[-1]
-            # 判断是否到了最后一页
-            if next_page != 'javascript:;':
-                url = prefix_url + next_page
-                yield scrapy.Request(url=url, callback=self.parse)
+        # 定义下页标签的元素位置
+        # next_page = response.xpath('//div[@class="page"]/a/@href').extract()[4]
+        next_page = response.xpath('//div[@class="page"]/a/@href').extract()[-1]
+        # 判断是否到了最后一页
+        if next_page != 'javascript:;':
+            url = prefix_url + next_page
+            yield scrapy.Request(url=url, callback=self.parse)

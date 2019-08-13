@@ -1,0 +1,32 @@
+
+1、怎么将方法外的raw_input输入的字符串带到方法内使用？？
+   ---->目的：显示商品类别、替换分页的cid
+   ---->问题实质为：在方法内怎么访问类的属性？？  ---> 类名.属性
+
+2、将数据导出到csv文件、excel文件、xml文件、json文件、txt文件等等文本中？？
+    ---->以导出到CSV文件为例，研究一下导出方法有哪些，以及优缺点？
+
+    方法一（命令行）：执行scrapy crawl good_info时指定文件名称、格式以及编码格式
+        如：scrapy crawl good_info -o buy_good_infos.csv -s feed_export_encoding=gbk
+        # 问题：该命令好像不能指定输出目录，csv的头部会使用默认的英文字段，无法调整csv的尺寸显示等等
+
+    方法二（配置）：在settings.py文件配置输出csv类型，输出路径，以及编码格式
+        # 输出配置
+        FEED_URI = u'file:///' + os.getcwd() + u'\BaidaShoppingSpider\csv\\bdysc_{}.csv'.format(now_time)
+        FEED_FORMAT = 'CSV'
+        FEED_EXPORT_ENCODING = 'GBK'
+        # 问题：csv的头部会使用默认的英文字段，无法调整csv的尺寸显示等等
+
+    方法三（撸代码）：在pipeline.py中通过IO流将数据写入csv文件
+        注意的问题：
+            1、头部和内容的乱码
+            2、不同Python版本解决CSV文件有空行输出
+
+    注: 导出其他文本格式的思路亦是如此
+----------------------
+  保存到TXT和JSON文件，只能保存一行数据？？？
+  ----->txt的模式：改为追加模式即可
+	json使用codecs模块写操作
+-----------------------
+  保存到mysql里出现1604错误？？？
+  ----->数据插不进去mysql，待解决~~

@@ -1,0 +1,70 @@
+笔记
+----------------------
+百大易商城的首页：http://www.bdego.com/
+实现需求：爬取数据，做数据统计分析，做可视化分析，词云等等
+-------------
+430385 -- 生活电器、办公文娱
+430386 -- 厨房电器
+430395 -- 生活电器
+430413 -- 保健器材
+430401--个人健康
+430405--办公文仪
+430418--运动用品
+430423--学生用品
+
+分析"生活电器"类的商品信息的网页特点：
+	智能设备地址：http://www.bdego.com/product_list.jsp?cid=c_1780003&keyword=
+	电风扇/电暖器地址：http://www.bdego.com/product_list.jsp?cid=c_430396&keyword=
+	电器附件地址：http://www.bdego.com/product_list.jsp?cid=c_560000&keyword=
+	手机数码地址：http://www.bdego.com/product_list.jsp?cid=c_670023&keyword=
+可以看出通过cid区分分类：
+智能设备 -1780003
+电风扇/电暖器 -430396
+吸尘器 -430397
+电熨斗 -430398
+加湿器 -430399
+空气净化器 -430400
+电器附件 -560000
+手机数码 -670023
+-------------------------------
+以"手机数码地址"为例：（分页列表）
+  每页地址特点：
+	http://www.bdego.com/list-670023/p1.html
+	....
+	http://www.bdego.com/list-670023/p7.html
+ 爬取字段和xpath：
+ 	商品图片：good_picture：//*[@id="prodcutListUl"]//li//div[@class="pic"]/div/a/img/@src
+	商品名称属性：good_alt：//*[@id="prodcutListUl"]//li//div[@class="txt"]/a/text()
+	商品价格：good_price：//*[@id="prodcutListUl"]//li//div[@class="price"]/text()
+	配送店家：hotel：//*[@id="prodcutListUl"]//li//div[@class="price"]/span/a/text()
+	商品详情链接：good_detail_url：//*[@id="prodcutListUl"]//li//div[@class="pic"]/div/a/@href
+分页xpath：
+	是否到了最后一页：//*[@id="infoPage"]/ul//li/a[@class="downPage"]/@title		
+	提示语：目前已是最后一页
+	当前页码：//*[@id="infoPage"]/ul//li/a[@class="nowPage"]/text()
+
+# 测试
+ 	通过cmd里scrapy shell调试发现，无反爬虫机制，测试xpath节点均有数据
+#创建项目
+	scrapy startproject BaidaShoppingSpider
+#创建Spider类
+	scrapy genspider good_info "bdego.com"
+# 定义item、开发Spider类、配置输出管道
+
+# 启动项目(进入项目目录下)
+	scrapy crawl good_info
+# 导出到各种文件格式中
+   配置字典项、流程条件控制
+
+报错：
+AttributeError: 'list' object has no attribute 'encode'
+---->
+这里的node_list是通过extract()进行获取出来的，在遍历node_list会
+	出现如AttributeError: 'list' object has no attribute 'xpath'的错误
+
+1064, u"You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '?????\u8c78,??????H
+841P \u0377??\u02bd????,??169.00,http://60.166.15.148/upload/s1/2018/9/3' at line 1")
+------->
+msql插不进去数据，对数据的检查比较严格，目前尝试了百度的方法，并不奏效~~~
+
+
